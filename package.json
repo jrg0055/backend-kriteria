@@ -11,12 +11,31 @@
 	},
 	"devDependencies": {
 		"@cloudflare/vitest-pool-workers": "^0.8.19",
+		"@types/cors": "^2.8.19",
 		"typescript": "^5.5.2",
 		"vitest": "~3.2.0",
 		"wrangler": "^4.44.0"
 	},
 	"dependencies": {
 		"@types/express": "^5.0.3",
-		"express": "^5.1.0"
-	}
+		"cors": "^2.8.5",
+		"express": "^5.2.1"
+	},
+	"description": "",
+	"main": "index.js",
+	"directories": {
+		"test": "test"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/jrg0055/backend-kriteria.git"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"type": "commonjs",
+	"bugs": {
+		"url": "https://github.com/jrg0055/backend-kriteria/issues"
+	},
+	"homepage": "https://github.com/jrg0055/backend-kriteria#readme"
 }

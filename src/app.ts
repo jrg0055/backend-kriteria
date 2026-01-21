@@ -1,0 +1,24 @@
+import express, { Request, Response } from "express";
+import cors from "cors";
+const app = express();
+const port = 5000;
+
+// Middleware para JSON
+app.use(express.json());
+
+// Ruta de prueba
+app.get("/api/hello", (req: Request, res: Response) => {
+    res.json({ message: "¡Hola desde el backend!" });
+});
+
+// Inicia el servidor
+app.listen(port, () => {
+    console.log(`Servidor corriendo en http://localhost:${port}`);
+});
+
+app.use(cors({ origin: 'http://localhost:3000' }));  // Solo permite peticiones desde React en puerto 3000
+
+app.post('/api/data', (req: Request, res: Response) => {
+    const data = req.body;  // Recibe datos JSON del frontend
+    res.json({ received: data, message: 'Datos recibidos correctamente' });
+});
