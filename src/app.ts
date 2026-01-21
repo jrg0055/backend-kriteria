@@ -1,5 +1,6 @@
 import express, { Request, Response } from "express";
 import cors from "cors";
+import * as groq from "./services/recommendationService";
 const app = express();
 const port = 5000;
 
@@ -9,6 +10,7 @@ app.use(express.json());
 // Ruta de prueba
 app.get("/api/hello", (req: Request, res: Response) => {
     res.json({ message: "¡Hola desde el backend!" });
+    groq.main("Quiero un coche por menos de 5000€ que me sirva para ir por el pueblo, tiene muchas cuestas y me acabo de sacar el carnet, vamos a por uno de segunda mano", "openai/gpt-oss-120b")
 });
 
 // Inicia el servidor
