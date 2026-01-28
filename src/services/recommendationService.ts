@@ -46,6 +46,7 @@ export async function getGroqChatCompletion(prompt:string, model:string) {
                     "you have to recommend the best product for them\n" +
                     "YOU HAVE TO ANSWER ALWAYS IN THE USER LANGUAGE.\n" +
                     "YOU ONLY HAVE TO ANSWER WITH A JSON, DON'T TALK \n" +
+                    "RECOMMEND AT LEAST 3 PRODUCTS\n" +
                     ""
             },
             {
