@@ -27,3 +27,5 @@ app.post('/api/data', (req: Request, res: Response) => {
     const data = req.body;  // Recibe datos JSON del frontend
     res.json({ received: data, message: 'Datos recibidos correctamente' });
 });
+
+export default app;

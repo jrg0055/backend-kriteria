@@ -5,12 +5,40 @@ import cors from "cors";
 import * as groq from "./services/recommendationService";
 const app = express();
 
+import dotenv from "dotenv";
+dotenv.config();
+
+import app from "./app.js";
+import connectDB from "./config/db";
+
+const PORT = process.env.PORT || 3000;
+
+async function startServer() {
+    await connectDB(); // 👈 CONEXIÓN AQUÍ
+
+    app.listen(PORT, () => {
+        console.log(`🚀 Servidor corriendo en puerto ${PORT}`);
+    });
+}
+
+startServer();
+
 // Middleware to parse JSON bodies
 app.use(express.json());
 
 // Health check endpoint
-app.get("/", (req, res) => {
-  res.json({ message: groq.main("Quiero un coche por menos de 5000€ que me sirva para ir por el pueblo, tiene muchas cuestas y me acabo de sacar el carnet, vamos a por uno de segunda mano", "openai/gpt-oss-120b") });
+// Ruta principal (hecha async para await)
+app.get("/", async (req: Request, res: Response) => {
+    try {
+        const result = await groq.main(
+            "Quiero un coche por menos de 5000€ que me sirva para ir por el pueblo, tiene muchas cuestas y me acabo de sacar el carnet, vamos a por uno de segunda mano",
+            "openai/gpt-oss-120b"  // Cambia a "llama3-8b-8192" si falla
+        );
+        res.json({ message: result });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Error en Groq API", error: error.message });
+    }
 });
 
 // GET all members
@@ -185,5 +213,7 @@ app.delete("/api/members/:id", async (req, res) => {
   }
 });
 
-app.listen(3000);
+//app.listen(3000);
 export default httpServerHandler({ port: 3000 });
+
+
