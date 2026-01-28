@@ -1,6 +1,6 @@
 import { env } from "cloudflare:workers";
 import { httpServerHandler } from "cloudflare:node";
-import express, { Request, Response } from "express";
+import express, {Request, Response} from "express";
 import cors from "cors";
 import * as groq from "./services/recommendationService";
 const app = express();
@@ -35,10 +35,11 @@ app.get("/", async (req: Request, res: Response) => {
             "Quiero un coche por menos de 5000€ que me sirva para ir por el pueblo, tiene muchas cuestas y me acabo de sacar el carnet, vamos a por uno de segunda mano",
             "openai/gpt-oss-120b"  // Cambia a "llama3-8b-8192" si falla
         );
-        res.json({ message: result });
+        const parsedResult = JSON.parse(result);  // Parsea el string a objeto JSON
+        res.json({ message: parsedResult });      // Usa el resultado parseado
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: "Error en Groq API", error: error.message });
+        res.status(500).json({ message: "Error en Groq API", error: (error as any).message });
     }
 });
 
@@ -216,5 +217,4 @@ app.delete("/api/members/:id", async (req, res) => {
 
 //app.listen(3000);
 export default httpServerHandler({ port: 3000 });
-
 

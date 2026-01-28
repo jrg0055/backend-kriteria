@@ -16,7 +16,7 @@ const groq = new Groq({ apiKey });
 
 // BÚSQUEDA Y RECOMENDACIÓN DE PRODUCTO
 
-export async function main(prompt: string, model: string): Promise<String> {
+export async function main(prompt: string, model: string): Promise<string> {
     const chatCompletion = await getGroqChatCompletion(prompt, model);
     // Print the completion returned by the LLM.
     return(chatCompletion.choices[0]?.message?.content || "");
