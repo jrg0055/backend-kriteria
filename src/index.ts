@@ -4,12 +4,16 @@ import express, {Request, Response} from "express";
 import cors from "cors";
 import * as groq from "./services/recommendationService";
 const app = express();
+app.use(cors({
+    origin: ["https://kriteria.pages.dev", "http://localhost:5173"], // Añade tu URL de Pages y la de local
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"]
+}));
+app.use(express.json());
 
 import dotenv from "dotenv";
 dotenv.config();
 
-// import app2 from "./app.js";
-// hay que cambiar el nombre porque app esta duplicado en la linea 6 tambien a
 // import connectDB from "./config/db";
 
 const PORT = process.env.PORT || 3000;
@@ -25,7 +29,6 @@ async function startServer() {
 startServer();
 
 // Middleware to parse JSON bodies
-app.use(express.json());
 
 // Health check endpoint
 // Ruta principal (hecha async para await)
@@ -218,5 +221,4 @@ app.delete("/api/members/:id", async (req, res) => {
   }
 });
 
-//app.listen(3000);
-export default httpServerHandler({ port: 3000 });
+export default httpServerHandler(app as any);
