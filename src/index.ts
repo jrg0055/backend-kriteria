@@ -8,7 +8,7 @@ const app = express();
 import dotenv from "dotenv";
 dotenv.config();
 
-//import app from "./app.js";
+//import app2 from "./app.js";
 // hay que cambiar el nombre porque app esta duplicado en la linea 6 tambien
 import connectDB from "./config/db";
 
