@@ -10,12 +10,12 @@ dotenv.config();
 
 // import app2 from "./app.js";
 // hay que cambiar el nombre porque app esta duplicado en la linea 6 tambien a
-import connectDB from "./config/db";
+// import connectDB from "./config/db";
 
 const PORT = process.env.PORT || 3000;
 
 async function startServer() {
-    await connectDB(); // 👈 CONEXIÓN AQUÍ
+    // await connectDB(); // 👈 CONEXIÓN AQUÍ
 
     app.listen(PORT, () => {
         console.log(`🚀 Servidor corriendo en puerto ${PORT}`);
