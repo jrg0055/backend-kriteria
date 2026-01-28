@@ -1,3 +1,5 @@
+import { config } from 'dotenv';
+config();
 import express, { Request, Response } from "express";
 import cors from "cors";
 import * as groq from "./services/recommendationService";

@@ -1,20 +1,25 @@
 import { env } from "cloudflare:workers";
-//import { config } from 'dotenv';
-//config();
+import { httpServerHandler } from "cloudflare:node";
+import { config } from 'dotenv';
+config();
 import Groq from "groq-sdk";
 
-// hacer un export
+const apiKey = env.GROQ_API_KEY;
 
-const groq = new Groq({ apiKey: env.GROQ_API_KEY });
+if (!apiKey) {
+    throw new Error("The GROQ_API_KEY environment variable is missing or empty.");
+}
+
+const groq = new Groq({ apiKey });
 
 
 
 // BÚSQUEDA Y RECOMENDACIÓN DE PRODUCTO
 
-export async function main(prompt: string, model: string): Promise<void> {
+export async function main(prompt: string, model: string): Promise<String> {
     const chatCompletion = await getGroqChatCompletion(prompt, model);
     // Print the completion returned by the LLM.
-    console.log(chatCompletion.choices[0]?.message?.content || "");
+    return(chatCompletion.choices[0]?.message?.content || "");
 }
 
 export async function getGroqChatCompletion(prompt:string, model:string) {
@@ -49,7 +54,6 @@ export async function getGroqChatCompletion(prompt:string, model:string) {
             }
         ],
         model: model,      //VARIABLE Q NOS PASAN ENTRE (gpt-oss-20b/gpt-oss-120b/gemini-3-flash)
-        tool_choice: "required",
         tools: [
             {
                 "type": "browser_search"
