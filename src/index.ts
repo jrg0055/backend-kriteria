@@ -96,6 +96,7 @@ app.put("/api/members/:id", async (req, res) => {
       return res.status(400).json({
         success: false,
         error: "At least one field (name or email) is required",
+
       });
     }
 
@@ -221,4 +222,5 @@ app.delete("/api/members/:id", async (req, res) => {
   }
 });
 
-export default httpServerHandler(app as any);
+// Al final de tu archivo
+export default httpServerHandler(3000);
