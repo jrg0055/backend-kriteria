@@ -1,7 +1,8 @@
 import { env } from "cloudflare:workers";
 import { httpServerHandler } from "cloudflare:node";
-import express from "express";
-
+import express, { Request, Response } from "express";
+import cors from "cors";
+import * as groq from "./services/recommendationService";
 const app = express();
 
 // Middleware to parse JSON bodies
@@ -9,7 +10,7 @@ app.use(express.json());
 
 // Health check endpoint
 app.get("/", (req, res) => {
-  res.json({ message: "Express.js running on Cloudflare Workers!" });
+  res.json({ message: groq.main("Quiero un coche por menos de 5000€ que me sirva para ir por el pueblo, tiene muchas cuestas y me acabo de sacar el carnet, vamos a por uno de segunda mano", "openai/gpt-oss-120b") });
 });
 
 // GET all members

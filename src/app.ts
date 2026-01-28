@@ -1,5 +1,6 @@
 import { config } from 'dotenv';
 config();
+import { httpServerHandler } from "cloudflare:node";
 import express, { Request, Response } from "express";
 import cors from "cors";
 import * as groq from "./services/recommendationService";
