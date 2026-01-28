@@ -31,12 +31,15 @@ app.use(express.json());
 // Ruta principal (hecha async para await)
 app.get("/", async (req: Request, res: Response) => {
     try {
-        const result = await groq.main(
-            "Quiero un coche por menos de 5000€ que me sirva para ir por el pueblo, tiene muchas cuestas y me acabo de sacar el carnet, vamos a por uno de segunda mano",
-            "openai/gpt-oss-120b"  // Cambia a "llama3-8b-8192" si falla
-        );
-        const parsedResult = JSON.parse(result);  // Parsea el string a objeto JSON
-        res.json({ message: parsedResult });      // Usa el resultado parseado
+
+        console.log("SOY FUNCIONAL")
+        //const result = await groq.main(
+        //    "Quiero un coche por menos de 5000€ que me sirva para ir por el pueblo, tiene muchas cuestas y me acabo de sacar el carnet, vamos a por uno de segunda mano",
+        //    "openai/gpt-oss-120b"  // Cambia a "llama3-8b-8192" si falla
+        //);
+        //const parsedResult = JSON.parse(result);  // Parsea el string a objeto JSON
+        //res.json({ message: parsedResult });      // Usa el resultado parseado
+        res.json({ message: "SOY FUNCIONAL" });
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: "Error en Groq API", error: (error as any).message });
