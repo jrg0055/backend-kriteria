@@ -25,7 +25,6 @@ app.use("/users", userRoutes);
 const PORT = process.env.PORT || 3000;
 
 async function startServer() {
-    //await connectDB(); // 👈 CONEXIÓN AQUÍ
 
     app.listen(PORT, () => {
         console.log(`🚀 Servidor corriendo en puerto ${PORT}`);
