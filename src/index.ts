@@ -14,12 +14,12 @@ app.use(express.json());
 import dotenv from "dotenv";
 dotenv.config();
 
-// import connectDB from "./config/db";
+//import connectDB from "./config/db";
 
 const PORT = process.env.PORT || 3000;
 
 async function startServer() {
-    // await connectDB(); // 👈 CONEXIÓN AQUÍ
+    //await connectDB(); // 👈 CONEXIÓN AQUÍ
 
     app.listen(PORT, () => {
         console.log(`🚀 Servidor corriendo en puerto ${PORT}`);
@@ -48,6 +48,75 @@ app.get("/", async (req: Request, res: Response) => {
         res.status(500).json({ message: "Error en Groq API", error: (error as any).message });
     }
 });
+
+interface SearchRequestBody {
+    prompt: string;
+    model: string;
+}
+
+app.post("/search", async (req: Request, res: Response) => {
+
+    try {
+        // 1. DESESTRUCTURACIÓN Y TIPADO
+        // Extraemos 'prompt' del cuerpo de la petición (req.body)
+        const { prompt } = req.body as SearchRequestBody;
+
+        // 2. VALIDACIÓN
+        if (!prompt || typeof prompt !== 'string') {
+            return res.status(400).json({
+                success: false,
+                message: "El prompt es obligatorio y debe ser texto."
+            });
+        }
+        // 3. CONFIGURACIÓN DEL MODELO
+        // Groq usa modelos como 'mixtral-8x7b-32768' o 'llama2-70b-4096'.
+        // 'mixtral' es excelente para seguir instrucciones JSON.
+        const MODELO = "gpt-oss-120b"; // Cambia según tus necesidades
+
+        // 4. LLAMADA AL SERVICIO
+        // Pasamos el prompt extraído y el modelo definido
+        const resultString = await groq.main(prompt, MODELO);
+
+        // 5. PARSEO Y RESPUESTA
+        // Intentamos convertir el string de la IA a objeto JSON real
+        let parsedResult;
+        try {
+            parsedResult = JSON.parse(resultString);
+        } catch (parseError) {
+            // Si la IA devuelve texto antes del JSON, esto fallará.
+            // Aquí podrías implementar una limpieza del string si fuera necesario.
+            console.error("Error parseando JSON de la IA:", resultString);
+            return res.status(500).json({
+                success: false,
+                message: "La IA no devolvió un formato válido.",
+                raw: resultString // Opcional: para depurar
+            });
+        }
+
+        // Enviamos la respuesta exitosa al frontend
+        res.status(200).json({
+            success: true,
+            data: parsedResult
+        });
+
+    } catch (error) {
+        console.error("Error en el endpoint /search:", error);
+        res.status(500).json({
+            success: false,
+            message: "Error interno del servidor."
+        });
+    }
+
+
+
+});
+
+
+
+
+
+
+
 
 // GET all members
 app.get("/api/members", async (req, res) => {
