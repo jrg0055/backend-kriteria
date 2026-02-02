@@ -11,15 +11,21 @@ app.use(cors({
 }));
 app.use(express.json());
 
+import connectDB from "./config/db";
+import userRoutes from "./routes/userRoutes";
 import dotenv from "dotenv";
 dotenv.config();
 
-//import connectDB from "./config/db";
+// Middlewares
+app.use(express.json());
+// Rutas
+app.use("/users", userRoutes);
 
+//import connectDB from "./config/db";
 const PORT = process.env.PORT || 3000;
 
 async function startServer() {
-    //await connectDB(); // 👈 CONEXIÓN AQUÍ
+    await connectDB(); // 👈 CONEXIÓN AQUÍ
 
     app.listen(PORT, () => {
         console.log(`🚀 Servidor corriendo en puerto ${PORT}`);
@@ -27,6 +33,8 @@ async function startServer() {
 }
 
 startServer();
+
+
 
 // Middleware to parse JSON bodies
 
