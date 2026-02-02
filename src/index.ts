@@ -11,7 +11,7 @@ app.use(cors({
 }));
 app.use(express.json());
 
-import connectDB from "./config/db";
+import {connectDB} from "./config/db";
 import userRoutes from "./routes/userRoutes";
 import dotenv from "dotenv";
 dotenv.config();
@@ -42,18 +42,16 @@ startServer();
 // Ruta principal (hecha async para await)
 app.get("/", async (req: Request, res: Response) => {
     try {
-
-        console.log("SOY FUNCIONAL")
-        //const result = await groq.main(
-        //    "Quiero un coche por menos de 5000€ que me sirva para ir por el pueblo, tiene muchas cuestas y me acabo de sacar el carnet, vamos a por uno de segunda mano",
-        //    "openai/gpt-oss-120b"  // Cambia a "llama3-8b-8192" si falla
-        //);
-        //const parsedResult = JSON.parse(result);  // Parsea el string a objeto JSON
-        //res.json({ message: parsedResult });      // Usa el resultado parseado
-        res.json({ message: "SOY FUNCIONAL" });
+        await connectDB();
+        res.status(200).json({
+            success: true,
+            message: "Conexión a MongoDB verificada con éxito."
+        });
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: "Error en Groq API", error: (error as any).message });
+        res.status(500).json({
+            success: false,
+            message: "Error al verificar la conexión con la base de datos."
+        });
     }
 });
 
