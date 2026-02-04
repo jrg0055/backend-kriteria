@@ -76,7 +76,7 @@ app.post("/search", async (req: Request, res: Response) => {
         // 3. CONFIGURACIÓN DEL MODELO
         // Groq usa modelos como 'mixtral-8x7b-32768' o 'llama2-70b-4096'.
         // 'mixtral' es excelente para seguir instrucciones JSON.
-        const MODELO = "gpt-oss-120b"; // Cambia según tus necesidades
+        const MODELO = "openai/gpt-oss-120b"; // Cambia según tus necesidades
 
         // 4. LLAMADA AL SERVICIO
         // Pasamos el prompt extraído y el modelo definido
