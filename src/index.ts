@@ -22,10 +22,6 @@ dotenv.config();
 
 // Middlewares
 app.use(express.json());
-// Rutas
-app.use("/users", userRoutes);
-app.use("/auth", userRoutes);
-
 app.use(async (req, res, next) => {
     try {
         await connectDB(); // connectDB debe tener lógica para no reconectar si ya está listo
@@ -34,6 +30,10 @@ app.use(async (req, res, next) => {
         res.status(500).json({ error: "Error de conexión a la base de datos" });
     }
 });
+// Rutas
+app.use("/users", userRoutes);
+app.use("/auth", userRoutes);
+
 const PORT = process.env.PORT || 3000;
 
 async function startServer() {
