@@ -26,7 +26,14 @@ app.use(express.json());
 app.use("/users", userRoutes);
 app.use("/auth", userRoutes);
 
-
+app.use(async (req, res, next) => {
+    try {
+        await connectDB(); // connectDB debe tener lógica para no reconectar si ya está listo
+        next();
+    } catch (error) {
+        res.status(500).json({ error: "Error de conexión a la base de datos" });
+    }
+});
 const PORT = process.env.PORT || 3000;
 
 async function startServer() {
@@ -46,7 +53,6 @@ startServer();
 // Health check endpoint
 // Ruta principal (hecha async para await)
 app.get("/", async (req: Request, res: Response) => {
-    await connectDB();
     res.status(200).json({ success: true, message: "KriterIA API Online" });
 });
 
