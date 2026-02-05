@@ -11,7 +11,7 @@ app.use(cors({
 }));
 app.use(express.json());
 
-
+import auth from "./middlewares/auth";
 import {connectDB} from "./config/db";
 import userRoutes from "./routes/userRoutes";
 import dotenv from "dotenv";
@@ -24,6 +24,7 @@ dotenv.config();
 app.use(express.json());
 // Rutas
 app.use("/users", userRoutes);
+app.use("/api/auth", auth);
 
 
 const PORT = process.env.PORT || 3000;
