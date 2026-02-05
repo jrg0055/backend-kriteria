@@ -1,6 +1,6 @@
 // typescript
 import { Router, Request, Response } from "express";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import User from "../schemas/User";
 
 const router = Router();
