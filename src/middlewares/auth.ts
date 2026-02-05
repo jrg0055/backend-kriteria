@@ -12,22 +12,30 @@ router.post("/login", async (req: Request, res: Response) => {
         const user = await User.findOne({ email });
 
         if (!user || !user.password) {
-            return res.json({ success: false });
+            return res.status(401).json({ success: false, message: "Usuario o contraseña incorrectos" });
         }
 
         const isValid = await bcrypt.compare(password, user.password);
 
         if (!isValid) {
-            return res.json({ success: false });
+            return res.status(401).json({ success: false, message: "Usuario o contraseña incorrectos" });
         }
 
-        return res.json({ success: true });
+        return res.json({
+            success: true,
+            user: {
+                id: user._id,
+                name: (user as any).name,
+                email: user.email,
+                role: (user as any).role
+            }
+        });
 
     } catch (error) {
         console.error("Error en login:", error);
         return res.status(500).json({
             success: false,
-            message: "No funciona"
+            message: "Error interno del servidor"
         });
     }
 });
@@ -37,7 +45,6 @@ router.post("/register", async (req: Request, res: Response) => {
     try {
         const { name, email, password } = req.body;
 
-        // 1. Validar campos obligatorios
         if (!name || !email || !password) {
             return res.status(400).json({
                 success: false,
@@ -45,7 +52,6 @@ router.post("/register", async (req: Request, res: Response) => {
             });
         }
 
-        // 2. Comprobar si el usuario ya existe
         const existingUser = await User.findOne({ email });
         if (existingUser) {
             return res.status(400).json({
@@ -54,11 +60,9 @@ router.post("/register", async (req: Request, res: Response) => {
             });
         }
 
-        // 3. Hashear la contraseña
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
 
-        // 4. Crear el nuevo usuario (rol y fecha por defecto manejados por el esquema o manualmente)
         const newUser = new User({
             name,
             email,
@@ -69,15 +73,17 @@ router.post("/register", async (req: Request, res: Response) => {
 
         await newUser.save();
 
+        const userObj = newUser.toObject();
+
         return res.status(201).json({
             success: true,
             message: "Usuario registrado con éxito",
             user: {
-                id: newUser._id,
-                name: newUser.name,
-                email: newUser.email,
-                role: newUser.role,
-                createdAt: newUser.createdAt
+                id: userObj._id,
+                name: userObj.name,
+                email: userObj.email,
+                role: userObj.role,
+                createdAt: userObj.createdAt
             }
         });
 

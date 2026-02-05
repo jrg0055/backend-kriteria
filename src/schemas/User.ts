@@ -1,11 +1,18 @@
 import { Schema, model } from "mongoose";
 
-interface IUser {
+export interface IUser {
+    name: string;
     email: string;
     password: string;
+    role: string;
+    createdAt?: Date;
 }
 
 const userSchema = new Schema<IUser>({
+    name: {
+        type: String,
+        required: true
+    },
     email: {
         type: String,
         required: true,
@@ -14,6 +21,14 @@ const userSchema = new Schema<IUser>({
     password: {
         type: String,
         required: true
+    },
+    role: {
+        type: String,
+        default: 'basic'
+    },
+    createdAt: {
+        type: Date,
+        default: Date.now
     }
 });
 
