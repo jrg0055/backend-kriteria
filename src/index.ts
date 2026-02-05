@@ -24,7 +24,7 @@ dotenv.config();
 app.use(express.json());
 // Rutas
 app.use("/users", userRoutes);
-app.use("/api/auth", auth);
+app.use("/auth", userRoutes);
 
 
 const PORT = process.env.PORT || 3000;
@@ -46,18 +46,8 @@ startServer();
 // Health check endpoint
 // Ruta principal (hecha async para await)
 app.get("/", async (req: Request, res: Response) => {
-    try {
-        await connectDB();
-        res.status(200).json({
-            success: true,
-            message: "Conexión a MongoDB verificada con éxito."
-        });
-    } catch (error) {
-        res.status(500).json({
-            success: false,
-            message: "Error al verificar la conexión con la base de datos."
-        });
-    }
+    await connectDB();
+    res.status(200).json({ success: true, message: "KriterIA API Online" });
 });
 
 // Búsqueda por IA
