@@ -11,10 +11,14 @@ app.use(cors({
 }));
 app.use(express.json());
 
+
 import {connectDB} from "./config/db";
 import userRoutes from "./routes/userRoutes";
 import dotenv from "dotenv";
 dotenv.config();
+
+
+
 
 // Middlewares
 app.use(express.json());

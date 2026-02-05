@@ -1,5 +1,7 @@
 {
 	"compilerOptions": {
+
+
 		/* Visit https://aka.ms/tsconfig.json to read more about this file */
 
 		/* Set the JavaScript language version for emitted JavaScript and include compatible library declarations. */
@@ -8,6 +10,8 @@
 		"lib": ["es2021"],
 		/* Specify what JSX code is generated. */
 		"jsx": "react-jsx",
+
+      "esModuleInterop": true,
 
 		/* Specify what module code is generated. */
 		"module": "es2022",
