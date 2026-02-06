@@ -75,6 +75,9 @@ startServer();
 app.get("/", async (req: Request, res: Response) => {
     res.status(200).json({ success: true, message: "KriterIA API Online" });
 });
+app.get("", async (req: Request, res: Response) => {
+    res.status(200).json({ success: true, message: "KriterIA API Online" });
+});
 
 // Búsqueda por IA
 interface SearchRequestBody {
