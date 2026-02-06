@@ -1,13 +1,11 @@
 import { env } from "cloudflare:workers";
 import { httpServerHandler } from "cloudflare:node";
-import express, {Request, Response, NextFunction} from "express";
+import express, { Request, Response, NextFunction } from "express";
 import cors from "cors";
 import * as groq from "./services/recommendationService";
 const app = express();
 
 const allowedOrigins = ["https://kriteria.pages.dev", "http://localhost:5173"];
-
-app.options('/search', cors());
 
 // CORS middleware con credenciales y headers explícitos
 app.use(cors({
@@ -15,19 +13,19 @@ app.use(cors({
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true
-}));
+}) as unknown as express.RequestHandler);
 // Fallback manual de CORS headers para asegurar compatibilidad con Cloudflare Workers
 app.use((req: Request, res: Response, next: NextFunction) => {
-    const origin = req.headers.origin;
+    const origin = req.get("origin");
     if (origin && allowedOrigins.includes(origin)) {
-        res.setHeader("Access-Control-Allow-Origin", origin);
-        res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-        res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
-        res.setHeader("Access-Control-Allow-Credentials", "true");
+        res.set("Access-Control-Allow-Origin", origin);
+        res.set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+        res.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
+        res.set("Access-Control-Allow-Credentials", "true");
     }
     // Responder inmediatamente a preflight OPTIONS
     if (req.method === "OPTIONS") {
-        return res.status(204).end();
+        return res.status(204).send();
     }
     next();
 });
@@ -35,36 +33,31 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 app.use(express.json());
 
 import auth from "./middlewares/auth";
-import {connectDB} from "./config/db";
+import { connectDB } from "./config/db";
 import userRoutes from "./routes/userRoutes";
 import dotenv from "dotenv";
-import { model } from "mongoose";
 dotenv.config();
 
-// Middlewares
-app.use(async (req, res, next) => {
+// Middleware de conexión a MongoDB - solo para rutas que lo necesitan
+const dbMiddleware = async (req: Request, res: Response, next: NextFunction) => {
     try {
         await connectDB();
         next();
     } catch (error) {
+        console.error("Error de conexión a MongoDB:", error);
         res.status(500).json({ error: "Error de conexión a la base de datos" });
     }
+};
+
+// Rutas que requieren base de datos
+app.use("/users", dbMiddleware, userRoutes);
+app.use("/auth", dbMiddleware, userRoutes);
+
+// httpServerHandler requiere que Express escuche en el mismo puerto
+const PORT = 3000;
+app.listen(PORT, () => {
+    console.log(`🚀 Servidor corriendo en puerto ${PORT}`);
 });
-// Rutas
-app.use("/users", userRoutes);
-app.use("/auth", userRoutes);
-
-const PORT = process.env.PORT || 3000;
-
-async function startServer() {
-
-    app.listen(PORT, () => {
-        console.log(`🚀 Servidor corriendo en puerto ${PORT}`);
-    });
-
-}
-
-startServer();
 
 
 

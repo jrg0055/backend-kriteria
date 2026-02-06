@@ -1,16 +1,21 @@
 import { env } from "cloudflare:workers";
-import { httpServerHandler } from "cloudflare:node";
 import { config } from 'dotenv';
 config();
 import Groq from "groq-sdk";
 
-const apiKey = env.GROQ_API_KEY;
+// Lazy initialization - se crea el cliente solo cuando se necesita
+let groqClient: Groq | null = null;
 
-if (!apiKey) {
-    throw new Error("The GROQ_API_KEY environment variable is missing or empty.");
+function getGroqClient(): Groq {
+    if (!groqClient) {
+        const apiKey = env.GROQ_API_KEY;
+        if (!apiKey) {
+            throw new Error("The GROQ_API_KEY environment variable is missing or empty.");
+        }
+        groqClient = new Groq({ apiKey });
+    }
+    return groqClient;
 }
-
-const groq = new Groq({ apiKey });
 
 
 
@@ -19,11 +24,11 @@ const groq = new Groq({ apiKey });
 export async function main(prompt: string, model: string): Promise<string> {
     const chatCompletion = await getGroqChatCompletion(prompt, model);
     // Print the completion returned by the LLM.
-    return(chatCompletion.choices[0]?.message?.content || "");
+    return (chatCompletion.choices[0]?.message?.content || "");
 }
 
-export async function getGroqChatCompletion(prompt:string, model:string) {
-    return groq.chat.completions.create({
+export async function getGroqChatCompletion(prompt: string, model: string) {
+    return getGroqClient().chat.completions.create({
         messages: [
             {
                 role: "system",
