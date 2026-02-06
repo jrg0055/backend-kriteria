@@ -7,7 +7,7 @@ const app = express();
 
 const allowedOrigins = ["https://kriteria.pages.dev", "http://localhost:5173"];
 
-app.options('*', cors());
+app.options('/search', cors());
 
 // CORS middleware con credenciales y headers explícitos
 app.use(cors({
