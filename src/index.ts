@@ -38,6 +38,7 @@ import auth from "./middlewares/auth";
 import {connectDB} from "./config/db";
 import userRoutes from "./routes/userRoutes";
 import dotenv from "dotenv";
+import { model } from "mongoose";
 dotenv.config();
 
 // Middlewares
@@ -87,6 +88,7 @@ app.post("/search", async (req: Request, res: Response) => {
         // 1. DESESTRUCTURACIÓN Y TIPADO
         // Extraemos 'prompt' del cuerpo de la petición (req.body)
         const { prompt } = req.body as SearchRequestBody;
+        const { model } = req.body as SearchRequestBody;
 
         // 2. VALIDACIÓN
         if (!prompt || typeof prompt !== 'string') {
@@ -98,7 +100,7 @@ app.post("/search", async (req: Request, res: Response) => {
         // 3. CONFIGURACIÓN DEL MODELO
         // Groq usa modelos como 'mixtral-8x7b-32768' o 'llama2-70b-4096'.
         // 'mixtral' es excelente para seguir instrucciones JSON.
-        const MODELO = "openai/gpt-oss-120b"; // Cambia según tus necesidades
+        const MODELO = model; // Cambia según tus necesidades
 
         // 4. LLAMADA AL SERVICIO
         // Pasamos el prompt extraído y el modelo definido
