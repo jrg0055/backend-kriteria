@@ -7,6 +7,8 @@ const app = express();
 
 const allowedOrigins = ["https://kriteria.pages.dev", "http://localhost:5173"];
 
+app.options('*', cors());
+
 // CORS middleware con credenciales y headers explícitos
 app.use(cors({
     origin: allowedOrigins,
@@ -14,7 +16,6 @@ app.use(cors({
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true
 }));
-
 // Fallback manual de CORS headers para asegurar compatibilidad con Cloudflare Workers
 app.use((req: Request, res: Response, next: NextFunction) => {
     const origin = req.headers.origin;
