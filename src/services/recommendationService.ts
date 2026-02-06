@@ -19,15 +19,14 @@ function getGroqClient(): Groq {
 
 
 
-// BÚSQUEDA Y RECOMENDACIÓN DE PRODUCTO
+// BÚSQUEDA Y RECOMENDACIÓN DE PRODUCTO (con streaming)
 
-export async function main(prompt: string, model: string): Promise<string> {
-    const chatCompletion = await getGroqChatCompletion(prompt, model);
-    // Print the completion returned by the LLM.
-    return (chatCompletion.choices[0]?.message?.content || "");
+// Nueva función para streaming - evita timeout en Cloudflare
+export async function mainStream(prompt: string, model: string) {
+    return getGroqChatCompletionStream(prompt, model);
 }
 
-export async function getGroqChatCompletion(prompt: string, model: string) {
+export async function getGroqChatCompletionStream(prompt: string, model: string) {
     return getGroqClient().chat.completions.create({
         messages: [
             {
@@ -56,10 +55,11 @@ export async function getGroqChatCompletion(prompt: string, model: string) {
             },
             {
                 role: "user",
-                content: prompt     //VARIABLE QUE NOS TIENEN QUE PASAR DE FRONT
+                content: prompt
             }
         ],
-        model: model,      //VARIABLE Q NOS PASAN ENTRE (gpt-oss-20b/gpt-oss-120b/gemini-3-flash)
+        model: model,
+        stream: true,  // ← STREAMING HABILITADO
         tools: [
             {
                 "type": "browser_search"

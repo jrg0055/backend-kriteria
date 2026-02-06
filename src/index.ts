@@ -79,61 +79,56 @@ interface SearchRequestBody {
 }
 
 app.post("/search", async (req: Request, res: Response) => {
-
     try {
-        // 1. DESESTRUCTURACIÓN Y TIPADO
-        // Extraemos 'prompt' del cuerpo de la petición (req.body)
-        const { prompt } = req.body as SearchRequestBody;
-        const { model } = req.body as SearchRequestBody;
+        const { prompt, model } = req.body as SearchRequestBody;
 
-        // 2. VALIDACIÓN
         if (!prompt || typeof prompt !== 'string') {
             return res.status(400).json({
                 success: false,
                 message: "El prompt es obligatorio y debe ser texto."
             });
         }
-        // 3. CONFIGURACIÓN DEL MODELO
-        // Groq usa modelos como 'mixtral-8x7b-32768' o 'llama2-70b-4096'.
-        // 'mixtral' es excelente para seguir instrucciones JSON.
-        const MODELO = model; // Cambia según tus necesidades
 
-        // 4. LLAMADA AL SERVICIO
-        // Pasamos el prompt extraído y el modelo definido
-        const resultString = await groq.main(prompt, MODELO);
+        // Configurar headers para SSE (streaming)
+        res.set({
+            'Content-Type': 'text/event-stream',
+            'Cache-Control': 'no-cache',
+            'Connection': 'keep-alive'
+        });
+        (res as any).flushHeaders();
 
-        // 5. PARSEO Y RESPUESTA
-        // Intentamos convertir el string de la IA a objeto JSON real
-        let parsedResult;
-        try {
-            parsedResult = JSON.parse(resultString);
-        } catch (parseError) {
-            // Si la IA devuelve texto antes del JSON, esto fallará.
-            // Aquí podrías implementar una limpieza del string si fuera necesario.
-            console.error("Error parseando JSON de la IA:", resultString);
-            return res.status(500).json({
-                success: false,
-                message: "La IA no devolvió un formato válido.",
-                raw: resultString // Opcional: para depurar
-            });
+        // Obtener stream de Groq
+        const stream = await groq.mainStream(prompt, model);
+        let fullContent = '';
+
+        // Procesar chunks
+        for await (const chunk of stream) {
+            const content = chunk.choices[0]?.delta?.content || '';
+            if (content) {
+                fullContent += content;
+                (res as any).write(`data: ${JSON.stringify({ type: 'chunk', content })}\n\n`);
+            }
         }
 
-        // Enviamos la respuesta exitosa al frontend
-        res.status(200).json({
-            success: true,
-            data: parsedResult
-        });
+        // Enviar resultado final
+        try {
+            const parsedResult = JSON.parse(fullContent);
+            (res as any).write(`data: ${JSON.stringify({ type: 'done', success: true, data: parsedResult })}\n\n`);
+        } catch {
+            (res as any).write(`data: ${JSON.stringify({ type: 'done', success: true, raw: fullContent })}\n\n`);
+        }
+        (res as any).end();
 
     } catch (error) {
-        console.error("Error en el endpoint /search:", error);
-        res.status(500).json({
-            success: false,
-            message: "Error interno del servidor."
-        });
+        const errMsg = error instanceof Error ? error.message : String(error);
+        console.error("Error en /search:", errMsg, error);
+        if (res.headersSent) {
+            (res as any).write(`data: ${JSON.stringify({ type: 'error', message: errMsg })}\n\n`);
+            (res as any).end();
+        } else {
+            res.status(500).json({ success: false, message: errMsg });
+        }
     }
-
-
-
 });
 
 // Al final de tu archivo
