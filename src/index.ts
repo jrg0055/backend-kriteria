@@ -1,14 +1,36 @@
 import { env } from "cloudflare:workers";
 import { httpServerHandler } from "cloudflare:node";
-import express, {Request, Response} from "express";
+import express, {Request, Response, NextFunction} from "express";
 import cors from "cors";
 import * as groq from "./services/recommendationService";
 const app = express();
+
+const allowedOrigins = ["https://kriteria.pages.dev", "http://localhost:5173"];
+
+// CORS middleware con credenciales y headers explícitos
 app.use(cors({
-    origin: ["https://kriteria.pages.dev", "http://localhost:5173"], // Añade tu URL de Pages y la de local
+    origin: allowedOrigins,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"]
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true
 }));
+
+// Fallback manual de CORS headers para asegurar compatibilidad con Cloudflare Workers
+app.use((req: Request, res: Response, next: NextFunction) => {
+    const origin = req.headers.origin;
+    if (origin && allowedOrigins.includes(origin)) {
+        res.setHeader("Access-Control-Allow-Origin", origin);
+        res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+        res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+        res.setHeader("Access-Control-Allow-Credentials", "true");
+    }
+    // Responder inmediatamente a preflight OPTIONS
+    if (req.method === "OPTIONS") {
+        return res.status(204).end();
+    }
+    next();
+});
+
 app.use(express.json());
 
 import auth from "./middlewares/auth";
@@ -17,14 +39,10 @@ import userRoutes from "./routes/userRoutes";
 import dotenv from "dotenv";
 dotenv.config();
 
-
-
-
 // Middlewares
-app.use(express.json());
 app.use(async (req, res, next) => {
     try {
-        await connectDB(); // connectDB debe tener lógica para no reconectar si ya está listo
+        await connectDB();
         next();
     } catch (error) {
         res.status(500).json({ error: "Error de conexión a la base de datos" });
