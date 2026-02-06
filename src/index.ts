@@ -89,45 +89,24 @@ app.post("/search", async (req: Request, res: Response) => {
             });
         }
 
-        // Configurar headers para SSE (streaming)
-        res.set({
-            'Content-Type': 'text/event-stream',
-            'Cache-Control': 'no-cache',
-            'Connection': 'keep-alive'
-        });
-        (res as any).flushHeaders();
+        // Llamar a Groq (sin streaming porque browser_search + gpt-oss no lo soporta)
+        const result = await groq.mainStream(prompt, model);
+        const content = result.choices[0]?.message?.content || '';
 
-        // Obtener stream de Groq
-        const stream = await groq.mainStream(prompt, model);
-        let fullContent = '';
-
-        // Procesar chunks
-        for await (const chunk of stream) {
-            const content = chunk.choices[0]?.delta?.content || '';
-            if (content) {
-                fullContent += content;
-                (res as any).write(`data: ${JSON.stringify({ type: 'chunk', content })}\n\n`);
-            }
-        }
-
-        // Enviar resultado final
+        // Parsear JSON de la respuesta
+        let parsedResult;
         try {
-            const parsedResult = JSON.parse(fullContent);
-            (res as any).write(`data: ${JSON.stringify({ type: 'done', success: true, data: parsedResult })}\n\n`);
+            parsedResult = JSON.parse(content);
         } catch {
-            (res as any).write(`data: ${JSON.stringify({ type: 'done', success: true, raw: fullContent })}\n\n`);
+            return res.status(200).json({ success: true, raw: content });
         }
-        (res as any).end();
+
+        res.status(200).json({ success: true, data: parsedResult });
 
     } catch (error) {
         const errMsg = error instanceof Error ? error.message : String(error);
-        console.error("Error en /search:", errMsg, error);
-        if (res.headersSent) {
-            (res as any).write(`data: ${JSON.stringify({ type: 'error', message: errMsg })}\n\n`);
-            (res as any).end();
-        } else {
-            res.status(500).json({ success: false, message: errMsg });
-        }
+        console.error("Error en /search:", errMsg);
+        res.status(500).json({ success: false, message: errMsg });
     }
 });
 
