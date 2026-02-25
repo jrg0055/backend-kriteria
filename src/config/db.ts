@@ -13,7 +13,7 @@ export const client = new MongoClient(uri, {
 export async function connectDB(): Promise<void> {
     try {
         await client.connect();
-        await client.db("admin").command({ ping: 1 });
+        await client.db("Modelos").command({ ping: 1 });
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
     } catch (error) {
         console.error("Error connecting to MongoDB:", error);
