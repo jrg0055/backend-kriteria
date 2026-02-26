@@ -32,7 +32,7 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 
 app.use(express.json());
 
-import auth from "./middlewares/auth";
+
 import { connectDB } from "./config/db";
 import userRoutes from "./routes/userRoutes";
 import dotenv from "dotenv";
