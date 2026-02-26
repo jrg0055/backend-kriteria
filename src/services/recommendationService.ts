@@ -60,10 +60,10 @@ export async function getGroqChatCompletionStream(prompt: string, model: string)
         ],
         model: model,
         // stream: true NO COMPATIBLE con browser_search + gpt-oss
-        tools: [
-            {
-                "type": "browser_search"
-            }
-        ]
+        // tools: [
+        //     {
+        //         "type": "browser_search"
+        //     }
+        // ]
     });
 }
