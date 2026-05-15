@@ -27,7 +27,8 @@
 		"groq-sdk": "^0.37.0",
 		"jsonwebtoken": "^9.0.3",
 		"mongodb": "^7.0.0",
-		"mongoose": "^9.1.5"
+		"mongoose": "^9.1.5",
+		"openai": "^4.0.0"
 	},
 	"description": "",
 	"main": "index.js",
