@@ -26,7 +26,7 @@ function getOpenAIClient(): OpenAI {
 
 export async function mainStream(prompt: string, model: string) {
     try {
-        const actualModel = model.includes("gemini") ? model : "gemini-1.5-flash";
+        const actualModel = model.includes("gemini") ? model : "gemini-3.1-flash-lite-preview";
         
         // Inicializamos el cliente de forma segura AHORA, no al principio del archivo
         const openai = getOpenAIClient();
