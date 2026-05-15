@@ -1,28 +1,39 @@
 import { env } from "cloudflare:workers";
 import { config } from 'dotenv';
-import OpenAI from "openai"; // Asegúrate de que la 'I' sea mayúscula
+import OpenAI from "openai";
 
 config();
 
-// Inicializamos el cliente cambiando la Base URL a la de la API de Gemini
-const openai = new OpenAI({
-  apiKey: process.env.GEMINI_API_KEY, 
-  baseURL: "https://generativelanguage.googleapis.com/v1beta/openai/"
-});
+// Variable global para reutilizar el cliente y no saturar la memoria
+let openaiClient: OpenAI | null = null;
 
-// Exportamos mainStream para que index.ts pueda consumirla igual que antes
+function getOpenAIClient(): OpenAI {
+    if (!openaiClient) {
+        // En Cloudflare Workers leemos de 'env' exportado, con fallback a process.env para local
+        const apiKey = env.GEMINI_API_KEY || process.env.GEMINI_API_KEY;
+
+        if (!apiKey) {
+            throw new Error("La API Key de Gemini no está definida en las variables de entorno.");
+        }
+
+        openaiClient = new OpenAI({
+            apiKey: apiKey,
+            baseURL: "https://generativelanguage.googleapis.com/v1beta/openai/"
+        });
+    }
+    return openaiClient;
+}
+
 export async function mainStream(prompt: string, model: string) {
     try {
-        // Validación: Si tu frontend sigue enviando nombres de modelos de Groq (ej: "llama3..."), 
-        // forzamos el uso del modelo de Gemini. Si ya lo envías bien, usa el parámetro.
         const actualModel = model.includes("gemini") ? model : "gemini-1.5-flash";
+        
+        // Inicializamos el cliente de forma segura AHORA, no al principio del archivo
+        const openai = getOpenAIClient();
 
-        // Retornamos directamente la promesa. No usamos streaming ('stream: false' por defecto)
-        // tal como especificaste en los comentarios de tu index.ts
         return await openai.chat.completions.create({
             model: actualModel,
-            // Opcional pero muy recomendado: Fuerza a Gemini a devolver un JSON válido
-            response_format: { type: "json_object" }, 
+            response_format: { type: "json_object" },
             messages: [
                 {
                     role: "system",
@@ -56,6 +67,6 @@ export async function mainStream(prompt: string, model: string) {
         });
     } catch (error) {
         console.error("Error al conectar con Gemini:", error);
-        throw error; // Lanzamos el error para que index.ts lo capture en su bloque catch
+        throw error;
     }
 }
