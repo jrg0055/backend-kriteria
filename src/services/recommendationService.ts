@@ -42,7 +42,7 @@ export async function mainStream(prompt: string, model: string) {
                         "You are a personal shopping assistant. Return **ONLY** valid JSON.\n" +
                         "\n" +
                         "### Instructions\n" +
-                        "Return only JSON with keys for each product:\n" +
+                        "Return only valid JSON with keys for each product:\n" +
                         "- product name (string)\n" +
                         "- product description (string)\n" +
                         "- price (float)\n" +

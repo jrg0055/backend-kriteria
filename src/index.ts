@@ -92,7 +92,7 @@ app.post("/search", async (req: Request, res: Response) => {
         // Llamar a Groq (sin streaming porque browser_search + gpt-oss no lo soporta)
         const result = await groq.mainStream(prompt, model);
         const content = result.choices[0]?.message?.content || '';
-
+        console.log(result, content);
         // Parsear JSON de la respuesta
         let parsedResult;
         try {
